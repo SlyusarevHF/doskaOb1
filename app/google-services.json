@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "89608638637",
+    "project_id": "doskaob-9aed8",
+    "storage_bucket": "doskaob-9aed8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:89608638637:android:102f62638a5a8648e5b624",
+        "android_client_info": {
+          "package_name": "com.example.doskaob"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "89608638637-v7nku5apccgu6amgibmgd5pu3rsphscq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoWHsTThYjm420UB2yT3vUOSuscbUK59k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "89608638637-v7nku5apccgu6amgibmgd5pu3rsphscq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
