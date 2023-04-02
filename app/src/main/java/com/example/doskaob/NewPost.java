@@ -7,6 +7,33 @@ public class NewPost {
     private String tel;
     private String disc;
     private String key;
+    private String uid;
+    private String time;
+    private String cat;
+
+    public String getCat() {
+        return cat;
+    }
+
+    public void setCat(String cat) {
+        this.cat = cat;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
 
     public String getImageId() {
         return imageId;
