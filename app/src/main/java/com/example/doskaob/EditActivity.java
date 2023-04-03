@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.doskaob.utils.MyConstans;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -27,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 import java.net.URI;
@@ -40,6 +42,12 @@ public class EditActivity extends AppCompatActivity {
     private DatabaseReference dRef;
     private FirebaseAuth mAuth;
     private EditText editTitle, editPrice, editPhone, editDesc;
+    private  Boolean edit_state = false;
+    private String temp_cat = "";
+    private String temp_uid = "";
+    private String temp_time = "";
+    private String temp_key = "";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +60,7 @@ public class EditActivity extends AppCompatActivity {
         editPrice = findViewById(R.id.edPrice);
         editPhone = findViewById(R.id.edPhone);
         editDesc = findViewById(R.id.edDesc);
+
         spinner = findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.category_spinner, android.R.layout.simple_spinner_item);
@@ -59,6 +68,28 @@ public class EditActivity extends AppCompatActivity {
         spinner.setAdapter(adapter);
         mStorageRef = FirebaseStorage.getInstance().getReference("Images");
         imgItem = findViewById(R.id.imItem);
+        getMyIntent();
+    }
+    private void getMyIntent()
+    {
+        if(getIntent() != null)
+        {
+            Intent i = getIntent();
+            edit_state = i.getBooleanExtra(MyConstans.EDIT_STATE, false);
+            if(edit_state)setDataAds(i);
+        }
+    }
+    private void setDataAds(Intent i)
+    {
+        editPhone.setText(i.getStringExtra(MyConstans.TEL));
+        editTitle.setText(i.getStringExtra(MyConstans.TITLE));
+        editPrice.setText(i.getStringExtra(MyConstans.PRICE));
+        editDesc.setText(i.getStringExtra(MyConstans.DESC));
+        Picasso.get().load(i.getStringExtra(MyConstans.IMAGE_ID)).into(imgItem);
+        temp_cat= i.getStringExtra(MyConstans.CAT);
+        temp_uid= i.getStringExtra(MyConstans.UID);
+        temp_time= i.getStringExtra(MyConstans.TIME);
+        temp_key= i.getStringExtra(MyConstans.KEY);
     }
 
     @Override
@@ -69,7 +100,7 @@ public class EditActivity extends AppCompatActivity {
             if(resultCode == RESULT_OK)
             {
                 imgItem.setImageURI(data.getData());
-                uploadImage();
+
             }
         }
     }
@@ -91,7 +122,8 @@ public class EditActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Uri> task) {
                 uploadUri = task.getResult();
                 assert uploadUri != null;
-                Toast.makeText(EditActivity.this, "Upload done: " + uploadUri.toString(), Toast.LENGTH_SHORT).show();
+                savePost();
+                Toast.makeText(EditActivity.this, "Upload done", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -103,7 +135,14 @@ public class EditActivity extends AppCompatActivity {
     }
     public void onClickSavePost(View view)
     {
-        savePost();
+        if(!edit_state)
+        {
+            uploadImage();
+        }
+        else
+        {
+
+        }
     }
     public void onClickImage(View view)
     {
@@ -137,4 +176,22 @@ public class EditActivity extends AppCompatActivity {
             if(key != null)dRef.child(key).child("ads").setValue(post);
         }
     }
+    private void updatePost()
+    {
+        dRef = FirebaseDatabase.getInstance().getReference(temp_cat);
+        NewPost post = new NewPost();
+
+            post.setImageId(uploadUri.toString());
+            post.setTitle(editTitle.getText().toString());
+            post.setPrice(editPrice.getText().toString());
+            post.setTel(editPhone.getText().toString());
+            post.setDisc(editDesc.getText().toString());
+            post.setKey(temp_key);
+            post.setCat(temp_cat);
+            post.setTime(temp_time);
+            post.setUid(temp_uid);
+            dRef.child(temp_key).child("ads").setValue(post);
+
+    }
+
 }

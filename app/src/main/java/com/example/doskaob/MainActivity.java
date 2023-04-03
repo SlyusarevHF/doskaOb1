@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mAuth = FirebaseAuth.getInstance();
 
         getDataDB();
-        dbManager = new DbManager(dataSender);
+        dbManager = new DbManager(dataSender, this);
         dbManager.getDataFromDb("Машины");
         postAdapter.setDbManager(dbManager);
 

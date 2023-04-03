@@ -1,6 +1,8 @@
 package com.example.doskaob.Adapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +12,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.doskaob.DbManager;
+import com.example.doskaob.EditActivity;
 import com.example.doskaob.MainActivity;
 import com.example.doskaob.NewPost;
 import com.example.doskaob.R;
+import com.example.doskaob.utils.MyConstans;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -55,7 +60,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolderData
         private TextView TvPriceTel, TvDesc, TvTit;
         private ImageView imAds;
         private LinearLayout edit_layout;
-        private ImageButton del_button;
+        private ImageButton del_button, editButton;
+
         private OnItemClickCustom onItemClickCustom;
 
 
@@ -67,6 +73,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolderData
             imAds = itemView.findViewById(R.id.imAds);
             edit_layout = itemView.findViewById(R.id.edit_layout);
             del_button = itemView.findViewById(R.id.imDelAds);
+            editButton = itemView.findViewById(R.id.imEditAds);
             itemView.setOnClickListener(this);
             this.onItemClickCustom = onItemClickCustom;
         }
@@ -85,15 +92,39 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolderData
             String price_tel = "Цена : " + newPost.getPrice() + " Тел : " + newPost.getTel();
             TvPriceTel.setText(price_tel);
             String textDesc = null;
-            if(newPost.getDisc().length() > 50) textDesc = newPost.getDisc().substring(0,50) + "...";
+            if(newPost.getDisc().length() > 50)
+            {
+                textDesc = newPost.getDisc().substring(0,50) + "...";
+            }
+            else
+            {
+                textDesc = newPost.getDisc();
+            }
+
             TvDesc.setText(textDesc);
 
             del_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    dbManager.deleteItem(newPost);
-                    arrayPost.remove(getAdapterPosition());
-                    notifyItemRemoved(getAdapterPosition());
+                    deleteDialog(newPost,getAdapterPosition());
+                }
+            });
+            editButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v)
+                {
+                    Intent i = new Intent(context, EditActivity.class);
+                    i.putExtra(MyConstans.IMAGE_ID,newPost.getImageId());
+                    i.putExtra(MyConstans.TITLE,newPost.getTitle());
+                    i.putExtra(MyConstans.PRICE,newPost.getPrice());
+                    i.putExtra(MyConstans.TEL,newPost.getTel());
+                    i.putExtra(MyConstans.DESC,newPost.getDisc());
+                    i.putExtra(MyConstans.KEY,newPost.getKey());
+                    i.putExtra(MyConstans.UID,newPost.getUid());
+                    i.putExtra(MyConstans.TIME,newPost.getTime());
+                    i.putExtra(MyConstans.CAT,newPost.getCat());
+                    i.putExtra(MyConstans.EDIT_STATE,true);
+                    context.startActivity(i);
                 }
             });
         }
@@ -103,9 +134,36 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolderData
             onItemClickCustom.onItemSelected(getAdapterPosition());
         }
     }
+
+    private void deleteDialog(NewPost newPost, int position)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+         builder.setTitle(R.string.delete_title);
+         builder.setMessage(R.string.delete_message);
+         builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+             @Override
+             public void onClick(DialogInterface dialog, int which)
+             {
+
+             }
+         });
+
+        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                dbManager.deleteItem(newPost);
+                arrayPost.remove(position);
+                notifyItemRemoved(position);
+
+            }
+        });
+
+         builder.show();
+    }
     public interface OnItemClickCustom
     {
-        public void onItemSelected(int position);
+        void onItemSelected(int position);
     }
 
     public void updateAdapter(List<NewPost> listData)
